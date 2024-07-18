@@ -1,0 +1,90 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pomodoro Timer</title>
+    <!-- Include Tailwind CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <!-- Include custom styles -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body
+    class="bg-white text-gray-800 flex items-center justify-center min-h-screen"
+  >
+    <div class="max-w-sm p-6 bg-gray-100 rounded-lg shadow-lg">
+      <h1 class="text-2xl font-semibold mb-4">Pomodoro Timer</h1>
+      <div class="text-3xl font-bold mb-6" id="time">25:00</div>
+      <div class="flex space-x-4 mb-4">
+        <button
+          id="start-btn"
+          class="btn bg-gradient-to-r from-gray-600 to-gray-800 text-white px-4 py-2 rounded-lg shadow-sm"
+        >
+          Start
+        </button>
+        <button
+          id="pause-btn"
+          class="btn bg-gradient-to-r from-gray-600 to-gray-800 text-white px-4 py-2 rounded-lg shadow-sm"
+        >
+          Pause
+        </button>
+        <button
+          id="cancel-btn"
+          class="btn bg-gradient-to-r from-red-600 to-red-800 text-white px-4 py-2 rounded-lg shadow-sm"
+        >
+          Cancel
+        </button>
+      </div>
+      <div class="flex space-x-4 mb-4">
+        <button
+          id="minus-btn"
+          class="btn bg-gradient-to-r from-gray-400 to-gray-600 text-white px-4 py-2 rounded-lg shadow-sm"
+        >
+          -
+        </button>
+        <button
+          id="plus-btn"
+          class="btn bg-gradient-to-r from-gray-400 to-gray-600 text-white px-4 py-2 rounded-lg shadow-sm"
+        >
+          +
+        </button>
+        <button
+          id="short-break-btn"
+          class="btn bg-gradient-to-r from-gray-400 to-gray-600 text-white px-4 py-2 rounded-lg shadow-sm"
+        >
+          Short break
+        </button>
+        <button
+          id="long-break-btn"
+          class="btn bg-gradient-to-r from-gray-400 to-gray-600 text-white px-4 py-2 rounded-lg shadow-sm"
+        >
+          Long break
+        </button>
+      </div>
+      <div class="mb-4">
+        <input
+          type="text"
+          id="task-input"
+          placeholder="Enter task..."
+          class="input bg-gradient-to-r from-gray-100 to-gray-300 border-b-2 border-gray-400 focus:border-gray-600 px-3 py-2 rounded-lg w-full"
+        />
+        <button
+          id="add-task-btn"
+          class="btn bg-gradient-to-r from-gray-400 to-gray-600 text-white px-4 py-2 rounded-lg shadow-sm ml-2"
+        >
+          Add Task
+        </button>
+      </div>
+      <ul id="tasks" class="divide-y divide-gray-300">
+        <!-- Task items will be added dynamically -->
+      </ul>
+    </div>
+
+    <!-- Include script.js for functionality -->
+    <script src="script.js"></script>
+  </body>
+</html>

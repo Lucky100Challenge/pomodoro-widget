@@ -1,0 +1,18 @@
+/* styles.css */
+.input {
+  border-image-slice: 1;
+  border-image-source: linear-gradient(
+    to right,
+    rgba(107, 114, 128, 0.5),
+    rgba(156, 163, 175, 0.5)
+  );
+}
+
+.btn {
+  border-image-slice: 1;
+  border-image-source: linear-gradient(
+    to right,
+    rgba(107, 114, 128, 0.5),
+    rgba(156, 163, 175, 0.5)
+  );
+}

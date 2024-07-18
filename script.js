@@ -1,10 +1,10 @@
 // script.js
-let timer;
+let mainTimer;
+let taskTimers = {}; // Object to store timers for each task
 let timeLeft = 25 * 60; // Initial time of 25 minutes in seconds
 let isRunning = false;
 let isPaused = false;
 let incrementInterval;
-let currentTasks = []; // Array to store tasks completed during Pomodoro session
 
 const timeDisplay = document.getElementById('time');
 const startBtn = document.getElementById('start-btn');
@@ -24,25 +24,39 @@ function updateTimeDisplay() {
     timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-function startTimer() {
-    timer = setInterval(() => {
+function startMainTimer() {
+    mainTimer = setInterval(() => {
         if (timeLeft > 0) {
             timeLeft--;
             updateTimeDisplay();
+            updateTaskTimers(); // Update task timers every second
         } else {
-            clearInterval(timer);
+            clearInterval(mainTimer);
             isRunning = false;
             startBtn.textContent = 'Start';
             pauseBtn.textContent = 'Pause';
-            logCompletedTasks();
+            clearIntervalAllTaskTimers(); // Clear all task timers when main timer ends
         }
     }, 1000);
+
+    // Start task timers when main timer starts
+    Object.keys(taskTimers).forEach(taskId => {
+        const task = taskTimers[taskId];
+        task.timer = setInterval(() => {
+            if (!isPaused && isRunning) {
+                task.time++;
+                const minutes = Math.floor(task.time / 60);
+                const seconds = task.time % 60;
+                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                task.display.textContent = timeString;
+            }
+        }, 1000);
+    });
 }
 
 function stopTimer() {
-    clearInterval(timer);
+    clearInterval(mainTimer);
     isRunning = false;
-    isPaused = false;
 }
 
 function handleIncrementButton(button, increment) {
@@ -64,32 +78,28 @@ function handleIncrementButton(button, increment) {
     });
 }
 
-function logCompletedTasks() {
-    const completedTasks = document.querySelectorAll('.task-item.checked');
-    completedTasks.forEach(task => {
-        const taskName = task.querySelector('span').textContent;
-        const taskObject = {
-            name: taskName,
-            startTime: null,
-            endTime: null,
-            elapsedTime: null
-        };
-        currentTasks.push(taskObject);
+function updateTaskTimers() {
+    Object.keys(taskTimers).forEach(taskId => {
+        if (taskTimers[taskId].running) {
+            taskTimers[taskId].time++;
+            const minutes = Math.floor(taskTimers[taskId].time / 60);
+            const seconds = taskTimers[taskId].time % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            taskTimers[taskId].display.textContent = timeString;
+        }
     });
 }
 
-function startTaskTimer(task) {
-    task.startTime = new Date();
-}
-
-function completeTask(task) {
-    task.endTime = new Date();
-    task.elapsedTime = (task.endTime - task.startTime) / 1000; // Convert to seconds
+function clearIntervalAllTaskTimers() {
+    Object.keys(taskTimers).forEach(taskId => {
+        clearInterval(taskTimers[taskId].timer);
+        taskTimers[taskId].running = false;
+    });
 }
 
 startBtn.addEventListener('click', () => {
     if (!isRunning && !isPaused) {
-        startTimer();
+        startMainTimer();
         isRunning = true;
         startBtn.textContent = 'Start';
     }
@@ -99,10 +109,11 @@ pauseBtn.addEventListener('click', () => {
     if (isRunning) {
         isPaused = !isPaused;
         if (isPaused) {
-            clearInterval(timer);
+            clearInterval(mainTimer);
             pauseBtn.textContent = 'Resume';
+            clearIntervalAllTaskTimers();
         } else {
-            startTimer();
+            startMainTimer();
             pauseBtn.textContent = 'Pause';
         }
     }
@@ -114,8 +125,8 @@ cancelBtn.addEventListener('click', () => {
     updateTimeDisplay();
     startBtn.textContent = 'Start';
     pauseBtn.textContent = 'Pause';
-    currentTasks = [];
-    tasks.innerHTML = ''; // Clear tasks list
+    isPaused = false;
+    clearIntervalAllTaskTimers();
 });
 
 handleIncrementButton(minusBtn, -60);
@@ -134,23 +145,24 @@ longBreakBtn.addEventListener('click', () => {
 addTaskBtn.addEventListener('click', () => {
     const taskText = taskInput.value.trim();
     if (taskText !== '') {
+        const taskId = Date.now().toString(); // Unique ID for each task timer
         const li = document.createElement('li');
-        li.className = 'flex items-center justify-between p-2 bg-gray-200 rounded-lg task-item';
+        li.className = 'flex items-center justify-between p-2 bg-gray-200 rounded-lg';
 
         const span = document.createElement('span');
         span.textContent = taskText;
         li.appendChild(span);
+
+        const taskTimeDisplay = document.createElement('span');
+        taskTimeDisplay.textContent = '00:00';
+        taskTimeDisplay.className = 'task-time';
+        li.appendChild(taskTimeDisplay);
 
         const checkBtn = document.createElement('button');
         checkBtn.className = 'task-btn px-2 py-1 text-white bg-green-500 rounded-lg shadow hover:bg-green-600';
         checkBtn.textContent = 'Check';
         checkBtn.addEventListener('click', () => {
             span.classList.toggle('checked');
-            if (span.classList.contains('checked')) {
-                startTaskTimer(currentTasks.find(task => task.name === taskText));
-            } else {
-                completeTask(currentTasks.find(task => task.name === taskText));
-            }
         });
         li.appendChild(checkBtn);
 
@@ -158,11 +170,22 @@ addTaskBtn.addEventListener('click', () => {
         deleteBtn.className = 'task-btn px-2 py-1 text-white bg-red-500 rounded-lg shadow hover:bg-red-600';
         deleteBtn.textContent = 'Delete';
         deleteBtn.addEventListener('click', () => {
+            clearInterval(taskTimers[taskId].timer);
+            delete taskTimers[taskId];
             tasks.removeChild(li);
         });
         li.appendChild(deleteBtn);
 
         tasks.appendChild(li);
+
+        // Initialize task timer, but don't start it yet
+        taskTimers[taskId] = {
+            timer: null,
+            time: 0,
+            display: taskTimeDisplay,
+            running: false
+        };
+
         taskInput.value = '';
     }
 });

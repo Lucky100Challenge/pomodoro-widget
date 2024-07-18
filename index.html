@@ -21,6 +21,30 @@
         text-decoration: line-through;
         color: grey;
       }
+      .task-time {
+        font-size: 0.8rem;
+        color: #666;
+      }
+      .balloon {
+        position: absolute;
+        width: 30px;
+        height: 40px;
+        background: url("https://www.pngkey.com/png/full/94-945815_balloon-png-transparent-image-balloon-png.png")
+          no-repeat;
+        background-size: cover;
+        animation: balloonAnimation 6s linear infinite;
+        transform: translateY(-100%);
+        z-index: 9999;
+      }
+
+      @keyframes balloonAnimation {
+        0% {
+          transform: translateY(-100%);
+        }
+        100% {
+          transform: translateY(100vh);
+        }
+      }
     </style>
   </head>
   <body class="bg-gray-100 flex items-center justify-center h-screen">
@@ -97,6 +121,7 @@
         </ul>
       </div>
     </div>
+    <div id="balloon-container"></div>
     <script src="script.js"></script>
   </body>
 </html>
